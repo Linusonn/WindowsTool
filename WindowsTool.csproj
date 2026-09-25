@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>WindowsTool</AssemblyName>
+    <RootNamespace>WindowsTool</RootNamespace>
+    <Version>0.1.0</Version>
+    <Product>Windows Tool</Product>
+    <Description>本地服务与工具的统一启停控制台</Description>
+    <ApplicationIcon></ApplicationIcon>
+    <!-- 单文件发布时不带控制台 -->
+    <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- features.json 跟随输出目录，方便直接改配置 -->
+    <None Update="features.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
