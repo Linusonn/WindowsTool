@@ -11,7 +11,8 @@
     <Version>0.1.0</Version>
     <Product>Windows Tool</Product>
     <Description>本地服务与工具的统一启停控制台</Description>
-    <ApplicationIcon></ApplicationIcon>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <Authors>Linusonn</Authors>
     <!-- 单文件发布时不带控制台 -->
     <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
   </PropertyGroup>

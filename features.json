@@ -11,8 +11,12 @@
         "args": "live_subtitle.py --engine sensevoice",
         "workingDirectory": "C:\\Users\\Linusonn\\tools\\live-subtitle"
       },
-      "stop": { "killByPid": true },
-      "detect": { "processNames": [] }
+      "stop": {
+        "killByPid": true
+      },
+      "detect": {
+        "processNames": []
+      }
     },
     {
       "id": "windows-live-captions",
@@ -23,8 +27,16 @@
         "file": "C:\\Windows\\System32\\LiveCaptions.exe",
         "useShellExecute": true
       },
-      "stop": { "killProcessNames": ["LiveCaptions"] },
-      "detect": { "processNames": ["LiveCaptions"] }
+      "stop": {
+        "killProcessNames": [
+          "LiveCaptions"
+        ]
+      },
+      "detect": {
+        "processNames": [
+          "LiveCaptions"
+        ]
+      }
     },
     {
       "id": "ollama",
@@ -35,8 +47,18 @@
         "file": "C:\\Users\\Linusonn\\AppData\\Local\\Programs\\Ollama\\ollama app.exe",
         "useShellExecute": true
       },
-      "stop": { "killProcessNames": ["ollama app", "ollama"] },
-      "detect": { "processNames": ["ollama"], "port": 11434 }
+      "stop": {
+        "killProcessNames": [
+          "ollama app",
+          "ollama"
+        ]
+      },
+      "detect": {
+        "processNames": [
+          "ollama"
+        ],
+        "port": 11434
+      }
     },
     {
       "id": "ai-girlfriend",
@@ -51,7 +73,9 @@
         "killByPid": false,
         "command": "C:\\Users\\Linusonn\\Documents\\comfy\\停止AI女友.bat"
       },
-      "detect": { "port": 8081 }
+      "detect": {
+        "port": 8081
+      }
     },
     {
       "id": "comfyui",
@@ -65,9 +89,11 @@
       "stop": {
         "killByPid": false,
         "command": "powershell.exe",
-        "commandArgs": "-NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\Linusonn\\Documents\\Project\\WindowsTool\\scripts\\stop-by-cmdline.ps1\" -Pattern ComfyUI\\main.py"
+        "commandArgs": "-NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\Linusonn\\tools\\WindowsTool\\scripts\\stop-by-cmdline.ps1\" -Pattern ComfyUI\\main.py"
       },
-      "detect": { "port": 8188 }
+      "detect": {
+        "port": 8188
+      }
     },
     {
       "id": "luna-translator",
@@ -78,8 +104,16 @@
         "file": "C:\\Users\\Linusonn\\tools\\LunaTranslator\\LunaTranslator.exe",
         "workingDirectory": "C:\\Users\\Linusonn\\tools\\LunaTranslator"
       },
-      "stop": { "killProcessNames": ["LunaTranslator"] },
-      "detect": { "processNames": ["LunaTranslator"] }
+      "stop": {
+        "killProcessNames": [
+          "LunaTranslator"
+        ]
+      },
+      "detect": {
+        "processNames": [
+          "LunaTranslator"
+        ]
+      }
     },
     {
       "id": "docker-desktop",
@@ -90,8 +124,16 @@
         "file": "C:\\Users\\Linusonn\\AppData\\Local\\Programs\\DockerDesktop\\Docker Desktop.exe",
         "useShellExecute": true
       },
-      "stop": { "killProcessNames": ["Docker Desktop"] },
-      "detect": { "processNames": ["Docker Desktop"] }
+      "stop": {
+        "killProcessNames": [
+          "Docker Desktop"
+        ]
+      },
+      "detect": {
+        "processNames": [
+          "Docker Desktop"
+        ]
+      }
     },
     {
       "id": "rtd-db",
@@ -107,7 +149,9 @@
         "command": "C:\\Users\\Linusonn\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe",
         "commandArgs": "stop rtd-oracle rtd-redis"
       },
-      "detect": { "port": 1521 }
+      "detect": {
+        "port": 1521
+      }
     }
   ]
 }

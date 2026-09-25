@@ -5,7 +5,7 @@ namespace WindowsTool.Controls;
 
 /// <summary>
 /// 星野粒子背景 —— 对标 linusonn.com 的 canvas 星空：
-/// 星点缓慢漂移 + 呼吸闪烁 + 鼠标视差，外加两团星云光晕和一层细网格。
+/// 星点缓慢漂移 + 呼吸闪烁，外加两团星云光晕和一层细网格（无鼠标跟随）。
 /// </summary>
 public class StarfieldBackground : FrameworkElement
 {
@@ -13,8 +13,6 @@ public class StarfieldBackground : FrameworkElement
 
     private Star[] _stars = Array.Empty<Star>();
     private readonly Random _rng = new(20260925);
-    private Point _mouse;
-    private Point _mouseTarget;
 
     private static readonly Color Cyan = Color.FromRgb(0x22, 0xD3, 0xEE);
     private static readonly Color Purple = Color.FromRgb(0xA7, 0x8B, 0xFA);
@@ -27,16 +25,6 @@ public class StarfieldBackground : FrameworkElement
         Loaded += (_, _) => { EnsureStars(); CompositionTarget.Rendering += OnFrame; };
         Unloaded += (_, _) => CompositionTarget.Rendering -= OnFrame;
         SizeChanged += (_, _) => EnsureStars();
-        // 鼠标视差：用窗口级鼠标位置
-        MouseMove += (_, _) => { };
-    }
-
-    /// <summary>供窗口转发鼠标位置以实现视差。</summary>
-    public void SetMouse(Point p)
-    {
-        var w = Math.Max(1, ActualWidth);
-        var h = Math.Max(1, ActualHeight);
-        _mouseTarget = new Point((p.X / w - 0.5) * 2, (p.Y / h - 0.5) * 2);
     }
 
     private void EnsureStars()
@@ -67,8 +55,6 @@ public class StarfieldBackground : FrameworkElement
     private void OnFrame(object? sender, EventArgs e)
     {
         _t += 0.016;
-        _mouse.X += (_mouseTarget.X - _mouse.X) * 0.06;
-        _mouse.Y += (_mouseTarget.Y - _mouse.Y) * 0.06;
         InvalidateVisual();
     }
 
@@ -82,9 +68,9 @@ public class StarfieldBackground : FrameworkElement
         dc.DrawRectangle(new SolidColorBrush(Color.FromRgb(0x03, 0x04, 0x0A)), null, new Rect(0, 0, w, h));
 
         // 星云：左上青、右下紫
-        DrawNebula(dc, new Point(w * 0.18 - _mouse.X * 26, h * 0.16 - _mouse.Y * 20), w * 0.62, Cyan, 0.16);
-        DrawNebula(dc, new Point(w * 0.86 - _mouse.X * 32, h * 0.88 - _mouse.Y * 26), w * 0.70, Purple, 0.15);
-        DrawNebula(dc, new Point(w * 0.62 - _mouse.X * 14, h * 0.42 - _mouse.Y * 12), w * 0.42, Pink, 0.05);
+        DrawNebula(dc, new Point(w * 0.18, h * 0.16), w * 0.62, Cyan, 0.16);
+        DrawNebula(dc, new Point(w * 0.86, h * 0.88), w * 0.70, Purple, 0.15);
+        DrawNebula(dc, new Point(w * 0.62, h * 0.42), w * 0.42, Pink, 0.05);
 
         // 细网格
         var gridPen = new Pen(new SolidColorBrush(Color.FromArgb(12, 0x22, 0xD3, 0xEE)), 1);
@@ -97,8 +83,8 @@ public class StarfieldBackground : FrameworkElement
         foreach (var s in _stars)
         {
             var drift = _t * s.Speed * (0.6 + s.Z);
-            var x = s.X - drift * 2.2 + _mouse.X * (4 + s.Z * 22);
-            var y = s.Y - drift * 0.5 + _mouse.Y * (3 + s.Z * 16);
+            var x = s.X - drift * 2.2;
+            var y = s.Y - drift * 0.5;
             x = ((x % w) + w) % w;
             y = ((y % h) + h) % h;
 

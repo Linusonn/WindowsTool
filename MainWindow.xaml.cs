@@ -67,9 +67,6 @@ public partial class MainWindow : Window
         }
     }
 
-    private void Window_MouseMove(object sender, MouseEventArgs e)
-        => Starfield.SetMouse(e.GetPosition(Starfield));
-
     private void Minimize_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
     private void Close_Click(object sender, RoutedEventArgs e) => Close();
 

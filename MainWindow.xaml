@@ -10,8 +10,7 @@
         ResizeMode="CanResize"
         TextOptions.TextFormattingMode="Ideal"
         UseLayoutRounding="True"
-        FontFamily="{StaticResource UiFont}"
-        MouseMove="Window_MouseMove">
+        FontFamily="{StaticResource UiFont}">
 
     <Border CornerRadius="18" ClipToBounds="True"
             BorderBrush="#1FFFFFFF" BorderThickness="1">
@@ -103,21 +102,23 @@
                                                            Margin="10,0,0,0" VerticalAlignment="Center"/>
                                             </StackPanel>
                                             <Border HorizontalAlignment="Right" VerticalAlignment="Center"
-                                                    Background="#12FFFFFF" CornerRadius="6" Padding="7,2">
-                                                <TextBlock Text="{Binding Category}" FontSize="10"
-                                                           Foreground="{StaticResource TextSecondary}"/>
+                                                    Background="#2622D3EE" CornerRadius="6" Padding="8,2.5"
+                                                    BorderBrush="#4422D3EE" BorderThickness="1">
+                                                <TextBlock Text="{Binding Category}" FontSize="10.5"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#8BE9F7"/>
                                             </Border>
                                         </Grid>
 
                                         <!-- 描述 -->
                                         <TextBlock Grid.Row="1" Text="{Binding Description}"
                                                    TextWrapping="Wrap" FontSize="11.5" MinHeight="32"
-                                                   Foreground="{StaticResource TextDim}" Margin="24,9,0,0"/>
+                                                   Foreground="#7E8AA0" Margin="24,9,0,0"/>
 
                                         <!-- 状态 + 启停 -->
                                         <Grid Grid.Row="2" Margin="24,12,0,0">
                                             <TextBlock Text="{Binding StatusText}" FontSize="11"
-                                                       Foreground="{StaticResource TextSecondary}"
+                                                       Foreground="#9AA6BC"
                                                        VerticalAlignment="Center"
                                                        TextTrimming="CharacterEllipsis"/>
                                             <Button HorizontalAlignment="Right" MinWidth="66"
