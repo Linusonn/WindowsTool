@@ -19,6 +19,25 @@
       }
     },
     {
+      "id": "live-subtitle-youtube",
+      "name": "实时字幕 · YouTube",
+      "description": "取 YouTube 官方字幕轨 → 本地 Hy-MT2 译中 → 透明悬浮字幕（油猴脚本上报视频；不占显存、不跑 ASR）",
+      "category": "AI",
+      "autoStart": false,
+      "start": {
+        "file": "C:\\Users\\Linusonn\\tools\\live-subtitle\\.venv\\Scripts\\pythonw.exe",
+        "args": "live_subtitle.py --engine ytcaption",
+        "workingDirectory": "C:\\Users\\Linusonn\\tools\\live-subtitle"
+      },
+      "stop": {
+        "killByPid": true
+      },
+      "detect": {
+        "processNames": [],
+        "port": 8765
+      }
+    },
+    {
       "id": "windows-live-captions",
       "name": "系统实时字幕",
       "description": "Windows 11 自带实时字幕（Win+Ctrl+L），同样抓系统音频",
