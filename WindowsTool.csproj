@@ -22,6 +22,10 @@
     <None Update="features.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <!-- 启停脚本一起发布，features.json 里直接引用输出目录下的 scripts\ -->
+    <None Update="scripts\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

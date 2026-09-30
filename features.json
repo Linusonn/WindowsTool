@@ -152,6 +152,50 @@
       "detect": {
         "port": 1521
       }
+    },
+    {
+      "id": "rtd-gui-backend",
+      "name": "RTD 平台后端",
+      "description": "Spring Boot 3 + MyBatis-Plus · 8081（Oracle 在跑走 prod，否则 H2 dev）",
+      "category": "RTD",
+      "autoStart": false,
+      "start": {
+        "file": "C:\\Users\\Linusonn\\tools\\WindowsTool\\scripts\\start-rtd-backend.bat"
+      },
+      "stop": {
+        "killByPid": false,
+        "command": "powershell.exe",
+        "commandArgs": "-NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\Linusonn\\tools\\WindowsTool\\scripts\\stop-by-cmdline.ps1\" -Pattern rtd-backend -Names java,javaw,cmd"
+      },
+      "detect": {
+        "processNames": [
+          "java"
+        ],
+        "port": 8081,
+        "matchAll": true
+      }
+    },
+    {
+      "id": "rtd-gui-frontend",
+      "name": "RTD 平台前端",
+      "description": "Vue 3 + Vite 6 开发服务器 · 5173（/api 代理到 8081）",
+      "category": "RTD",
+      "autoStart": false,
+      "start": {
+        "file": "C:\\Users\\Linusonn\\tools\\WindowsTool\\scripts\\start-rtd-frontend.bat"
+      },
+      "stop": {
+        "killByPid": false,
+        "command": "powershell.exe",
+        "commandArgs": "-NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\Linusonn\\tools\\WindowsTool\\scripts\\stop-by-cmdline.ps1\" -Pattern rtd-frontend -Names node,esbuild,cmd"
+      },
+      "detect": {
+        "processNames": [
+          "node"
+        ],
+        "port": 5173,
+        "matchAll": true
+      }
     }
   ]
 }

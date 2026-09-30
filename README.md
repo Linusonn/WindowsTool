@@ -65,11 +65,17 @@ dotnet build -c Release       # 出 Release
 - PID 记在 `%APPDATA%\WindowsTool\pids\<id>.pid`。
 
 ### 几个来自实战的坑
-- **bat 拉起来的 python 子进程杀不掉**：`killByPid` 记的是 cmd.exe，杀它不影响子进程。
-  用 `scripts/stop-by-cmdline.ps1 -Pattern xxx` 按命令行匹配结束（ComfyUI 就是这么配的）。
+- **bat 拉起来的子进程杀不掉**：`killByPid` 记的是 cmd.exe，杀它不影响子进程。
+  用 `scripts/stop-by-cmdline.ps1 -Pattern xxx [-Names java,node,cmd]` 按命令行匹配结束
+  （ComfyUI 就是这么配的；`-Names` 限定进程名，避免误杀别的进程）。
+  注意：PowerShell `-File` 调用时**逗号列表不会自动拆成数组**，脚本内部已按 `,`/空格拆开。
 - **进程名要能唯一定位**：`pythonw.exe` 这种不能作为 `detect.processNames`，
   会让别的脚本也误判成"运行中"。这类只用 PID 判定（`processNames: []`）。
 - **端口判定最省心**：服务类（Ollama 11434 / ComfyUI 8188 / ai-gateway 8081）优先用端口。
+  但 **8081 是共享端口**：ai-gateway（AI 女友）和 RTD 平台后端都用它，谁在跑另一方都会
+  误显示"运行中"——两卡片的 `detect` 都只看端口，介意的的话把其中一个挪走。
+- **`matchAll: true` 的卡片不要开 `killByPid`**：PID 也算一个判定条件，程序重启后
+  PID 文件没了就会一直显示"已停止"。这类卡片统一用 `killByPid: false` + 命令行停止脚本。
 
 ## 代码结构
 
@@ -82,9 +88,26 @@ Features/FeatureConfig.cs   features.json 的模型
 Features/ProcessFeature.cs  通用实现：进程 / 端口 / PID 三种探测 + 启停
 Features/FeatureManager.cs  加载配置、批量刷新、全部启停
 scripts/stop-by-cmdline.ps1 按命令行结束进程（bat 子进程场景）
+scripts/start-rtd-backend.bat   RTD 平台后端（Spring Boot，8081）
+scripts/start-rtd-frontend.bat  RTD 平台前端（Vue + Vite，5173）
 ```
 
 加一个新功能**不需要写 C#** —— 往 `features.json` 里加一段就行。
+
+## RTD 平台（Vue 3 + Spring Boot）怎么起来的
+
+项目本体在 `Documents\Project\RTD GUI`（`rtd-backend` / `rtd-frontend`），控制台里是两张卡片：
+
+| 卡片 | 脚本 | 做了什么 |
+|---|---|---|
+| RTD 平台后端 | `start-rtd-backend.bat [auto\|prod\|dev]` | 自动选 profile：1521 有监听 → `prod`(Docker Oracle)，否则 `dev`(H2 文件库)；jar 不存在或 `src`/`pom.xml` 比 jar 新就 `mvn package` 一次，然后 `java -jar target\rtd-backend.jar` |
+| RTD 平台前端 | `start-rtd-frontend.bat` | `npm run dev`（Vite 6，5173，`/api` 代理到 8081） |
+
+- 日志：`RTD GUI\logs\rtd-backend.log` / `rtd-frontend.log`（控制台窗口里也能直接看）。
+- 停止：两张卡片都是 `killByPid: false` + `stop-by-cmdline.ps1 -Pattern rtd-xxx -Names ...`，
+  连 bat 的 cmd 包装和 vite 的 esbuild 子进程一起收掉。
+- 顺序：先点「RTD 数据库」（Docker Oracle/Redis）、再「RTD 平台后端」、最后「RTD 平台前端」；
+  只跑 H2 的 dev 也能起，但**登录要 Redis**（失败计数），所以 Redis 容器还是得有。
 
 ## 当前已接入
 
@@ -98,3 +121,5 @@ scripts/stop-by-cmdline.ps1 按命令行结束进程（bat 子进程场景）
 | LunaTranslator | 进程 | 屏幕 OCR / 游戏文本翻译 |
 | Docker Desktop | 进程 | 容器运行时 |
 | RTD 数据库 | 1521 | rtd-oracle + rtd-redis |
+| RTD 平台后端 | java + 8081 | Spring Boot 3 + MyBatis-Plus（`RTD GUI\rtd-backend`） |
+| RTD 平台前端 | node + 5173 | Vue 3 + Vite 6 开发服务器（`RTD GUI\rtd-frontend`） |
