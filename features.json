@@ -215,6 +215,48 @@
         "port": 5173,
         "matchAll": true
       }
+    },
+    {
+      "id": "legendbox-vm",
+      "name": "虚拟机 · LegendBox",
+      "description": "传奇脏沙盒：一键开 Hyper-V 客户机控制台（Win11，快照/隔离见 D:\\HyperV）",
+      "category": "系统",
+      "autoStart": false,
+      "start": {
+        "file": "C:\\Users\\Linusonn\\tools\\WindowsTool\\scripts\\start-legendbox.bat"
+      },
+      "stop": {
+        "killProcessNames": [
+          "vmconnect"
+        ]
+      },
+      "detect": {
+        "processNames": [
+          "vmconnect"
+        ]
+      }
+    },
+    {
+      "id": "ssh-router",
+      "name": "SSH · 路由 Hermes",
+      "description": "给软路由上的 Hermes 开 SSH 通道（sshd 只认密钥、22 端口）。启动=备好配置并拉起服务，停止=关服务",
+      "category": "系统",
+      "autoStart": false,
+      "start": {
+        "file": "C:\\Users\\Linusonn\\tools\\WindowsTool\\scripts\\ssh-router.bat",
+        "args": "start"
+      },
+      "stop": {
+        "killByPid": false,
+        "command": "C:\\Users\\Linusonn\\tools\\WindowsTool\\scripts\\ssh-router.bat",
+        "commandArgs": "stop"
+      },
+      "detect": {
+        "processNames": [
+          "sshd"
+        ],
+        "port": 22
+      }
     }
   ]
 }
