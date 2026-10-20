@@ -52,6 +52,23 @@ function Show-Status {
   else { Write-Host "router key  : missing" }
 }
 
+function Repair-KeyAcls {
+  # sshd refuses host keys that any principal other than SYSTEM/Administrators can read
+  # ("UNPROTECTED PRIVATE KEY FILE" -> service aborts with 1067). ssh-keygen runs as the
+  # logged-on admin, so the keys keep an explicit ACE for that user: strip it.
+  $me = "$env:USERDOMAIN\$env:USERNAME"
+  $targets = @(Get-ChildItem (Join-Path $sshDir 'ssh_host_*_key') -ErrorAction SilentlyContinue) +
+             @(Get-Item (Join-Path $sshDir 'administrators_authorized_keys') -ErrorAction SilentlyContinue)
+  foreach ($f in $targets) {
+    $p = $f.FullName
+    icacls $p /inheritance:r | Out-Null
+    icacls $p /remove:g $me "NT AUTHORITY\Authenticated Users" "BUILTIN\Users" "Everyone" "NT AUTHORITY\INTERACTIVE" 2>&1 | Out-Null
+    icacls $p /grant "SYSTEM:F" "Administrators:F" | Out-Null
+    icacls $p /setowner "NT AUTHORITY\SYSTEM" 2>&1 | Out-Null
+  }
+  Write-Host ("key ACLs repaired: " + $targets.Count + " file(s)")
+}
+
 function Invoke-Start {
   if (-not (Test-Path $sshdExe)) {
     Write-Host "OpenSSH Server not installed - installing the Windows capability (needs internet)..."
@@ -93,6 +110,9 @@ Match Group administrators
   Set-ItemProperty -Path $rk -Name DefaultShellCommandOption -Value '-c'
 
   Set-Service -Name sshd -StartupType Automatic
+  Repair-KeyAcls
+  # 之前排查时留下的兜底启动任务，会让开机多起一个 sshd，清掉
+  Unregister-ScheduledTask -TaskName 'OpenSSH sshd (startup task)' -Confirm:$false -ErrorAction SilentlyContinue
   try { Start-Service sshd -ErrorAction Stop } catch { Write-Host ("Start-Service: " + $_.Exception.Message) }
   Start-Sleep -Seconds 2
 }
