@@ -9,7 +9,7 @@ namespace WindowsTool;
 public partial class MainWindow : Window
 {
     private readonly FeatureManager _manager = new();
-    private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromSeconds(2.5) };
+    private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromSeconds(3) };
     private bool _autoStartDone;
 
     public MainWindow()
@@ -22,6 +22,8 @@ public partial class MainWindow : Window
 
         _timer.Tick += async (_, _) =>
         {
+            // 最小化时不做状态轮询 / 不刷 UI（省 CPU 和内存抖动）
+            if (WindowState == WindowState.Minimized) return;
             await _manager.RefreshAllAsync();
             UpdateCounts();
         };
