@@ -1,0 +1,123 @@
+{
+  "note": "2026-10-24 从 features.json 移除的卡片，原样加回 features 数组即可复原",
+  "features": [
+    {
+      "id": "live-subtitle",
+      "name": "实时字幕",
+      "description": "系统声音 → SenseVoice 本地识别 → 透明悬浮字幕条",
+      "category": "AI",
+      "autoStart": false,
+      "start": {
+        "file": "C:\\Users\\Linusonn\\tools\\live-subtitle\\.venv\\Scripts\\pythonw.exe",
+        "args": "live_subtitle.py --engine sensevoice",
+        "workingDirectory": "C:\\Users\\Linusonn\\tools\\live-subtitle"
+      },
+      "stop": {
+        "killByPid": true
+      },
+      "detect": {
+        "processNames": []
+      }
+    },
+    {
+      "id": "windows-live-captions",
+      "name": "系统实时字幕",
+      "description": "Windows 11 自带实时字幕（Win+Ctrl+L），同样抓系统音频",
+      "category": "系统",
+      "start": {
+        "file": "C:\\Windows\\System32\\LiveCaptions.exe",
+        "useShellExecute": true
+      },
+      "stop": {
+        "killProcessNames": [
+          "LiveCaptions"
+        ]
+      },
+      "detect": {
+        "processNames": [
+          "LiveCaptions"
+        ]
+      }
+    },
+    {
+      "id": "ai-girlfriend",
+      "name": "AI 女友",
+      "description": "Ollama + ai-gateway(8081) + frp 隧道 一条龙",
+      "category": "AI",
+      "requiresOllama": true,
+      "start": {
+        "file": "C:\\Users\\Linusonn\\Documents\\comfy\\启动AI女友.bat",
+        "useShellExecute": true
+      },
+      "stop": {
+        "killByPid": false,
+        "command": "C:\\Users\\Linusonn\\Documents\\comfy\\停止AI女友.bat"
+      },
+      "detect": {
+        "port": 8081
+      }
+    },
+    {
+      "id": "rtd-db",
+      "name": "RTD 数据库",
+      "description": "rtd-oracle(1521) + rtd-redis(6379) 两个常驻容器",
+      "category": "容器",
+      "start": {
+        "file": "C:\\Users\\Linusonn\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe",
+        "args": "start rtd-oracle rtd-redis"
+      },
+      "stop": {
+        "killByPid": false,
+        "command": "C:\\Users\\Linusonn\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe",
+        "commandArgs": "stop rtd-oracle rtd-redis"
+      },
+      "detect": {
+        "port": 1521
+      }
+    },
+    {
+      "id": "rtd-gui-backend",
+      "name": "RTD 平台后端",
+      "description": "Spring Boot 3 + MyBatis-Plus · 8081（Oracle 在跑走 prod，否则 H2 dev）",
+      "category": "RTD",
+      "autoStart": false,
+      "start": {
+        "file": "C:\\Users\\Linusonn\\tools\\WindowsTool\\scripts\\start-rtd-backend.bat"
+      },
+      "stop": {
+        "killByPid": false,
+        "command": "powershell.exe",
+        "commandArgs": "-NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\Linusonn\\tools\\WindowsTool\\scripts\\stop-by-cmdline.ps1\" -Pattern rtd-backend -Names java,javaw,cmd"
+      },
+      "detect": {
+        "processNames": [
+          "java"
+        ],
+        "port": 8081,
+        "matchAll": true
+      }
+    },
+    {
+      "id": "rtd-gui-frontend",
+      "name": "RTD 平台前端",
+      "description": "Vue 3 + Vite 6 开发服务器 · 5173（/api 代理到 8081）",
+      "category": "RTD",
+      "autoStart": false,
+      "start": {
+        "file": "C:\\Users\\Linusonn\\tools\\WindowsTool\\scripts\\start-rtd-frontend.bat"
+      },
+      "stop": {
+        "killByPid": false,
+        "command": "powershell.exe",
+        "commandArgs": "-NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\Linusonn\\tools\\WindowsTool\\scripts\\stop-by-cmdline.ps1\" -Pattern rtd-frontend -Names node,esbuild,cmd"
+      },
+      "detect": {
+        "processNames": [
+          "node"
+        ],
+        "port": 5173,
+        "matchAll": true
+      }
+    }
+  ]
+}
