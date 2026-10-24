@@ -12,6 +12,10 @@ public class FeatureConfig
     /// <summary>随程序启动一起拉起。</summary>
     [JsonPropertyName("autoStart")] public bool AutoStart { get; set; }
 
+    /// <summary>这个功能依赖 Ollama：启动时先拉起 Ollama，最后一个依赖它的功能停掉后再把 Ollama 收走。</summary>
+    [JsonPropertyName("requiresOllama")] public bool RequiresOllama { get; set; }
+
+
     [JsonPropertyName("start")] public StartSpec? Start { get; set; }
     [JsonPropertyName("stop")] public StopSpec? Stop { get; set; }
     [JsonPropertyName("detect")] public DetectSpec? Detect { get; set; }
@@ -27,6 +31,8 @@ public class StartSpec
     [JsonPropertyName("runAsAdmin")] public bool RunAsAdmin { get; set; }
     /// <summary>用 ShellExecute 启动（某些程序如 UWP/快捷方式需要）。</summary>
     [JsonPropertyName("useShellExecute")] public bool UseShellExecute { get; set; }
+    /// <summary>启动时附加的环境变量（例如 OLLAMA_KEEP_ALIVE）。</summary>
+    [JsonPropertyName("env")] public Dictionary<string, string>? Env { get; set; }
 }
 
 public class StopSpec

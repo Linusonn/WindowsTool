@@ -35,6 +35,7 @@ public class ProcessFeature : IFeature
     public bool IsBusy => _busy;
     public bool CanStart => !_busy && _state != FeatureState.Running && _state != FeatureState.Starting;
     public bool CanStop => !_busy && (_state == FeatureState.Running || _state == FeatureState.Error || _state == FeatureState.Unknown);
+    public bool RequiresOllama => _cfg.RequiresOllama;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -104,6 +105,22 @@ public class ProcessFeature : IFeature
 
         _busy = true; Raise(nameof(IsBusy)); Raise(nameof(CanStart)); Raise(nameof(CanStop));
         Set(FeatureState.Starting, "启动中…");
+
+        // 依赖 Ollama 的功能：先把 Ollama 拉起来，起不来就别装成功
+        OllamaLog.Write($"start {_cfg.Id} requiresOllama={_cfg.RequiresOllama}");
+        if (_cfg.RequiresOllama)
+        {
+            Set(FeatureState.Starting, "启动 Ollama…");
+            var ok = await OllamaRuntime.EnsureStartedAsync();
+            OllamaLog.Write($"ensure-ollama for {_cfg.Id} => {ok}");
+            if (!ok)
+            {
+                _busy = false; Raise(nameof(IsBusy)); Raise(nameof(CanStart)); Raise(nameof(CanStop));
+                Set(FeatureState.Error, "Ollama 起不来：11434 可能被 Hyper-V/Docker 占走");
+                return;
+            }
+        }
+
         try
         {
             var spec = _cfg.Start;
@@ -117,6 +134,10 @@ public class ProcessFeature : IFeature
             };
             if (!string.IsNullOrWhiteSpace(spec.WorkingDirectory) && Directory.Exists(spec.WorkingDirectory))
                 psi.WorkingDirectory = spec.WorkingDirectory;
+
+            if (spec.Env is { Count: > 0 })
+                foreach (var kv in spec.Env)
+                    psi.Environment[kv.Key] = kv.Value;
 
             if (spec.RunAsAdmin)
             {
@@ -145,6 +166,7 @@ public class ProcessFeature : IFeature
 
     public async Task StopAsync()
     {
+        OllamaLog.Write($"stop {_cfg.Id} requiresOllama={_cfg.RequiresOllama}");
         _busy = true; Raise(nameof(IsBusy)); Raise(nameof(CanStart)); Raise(nameof(CanStop));
         Set(FeatureState.Stopping, "停止中…");
         try
@@ -200,6 +222,9 @@ public class ProcessFeature : IFeature
                 // 本来就没在跑
             }
             await Task.Delay(700);
+
+            // 依赖 Ollama 的功能停掉后，如果没人再需要它，就把 Ollama 收走（省显存）
+            if (_cfg.RequiresOllama) await OllamaCoordinator.ReleaseAsync(this);
         }
         catch (Exception ex)
         {

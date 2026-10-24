@@ -44,6 +44,8 @@ public class FeatureManager
 
         foreach (var cfg in file.Features)
             Features.Add(new ProcessFeature(cfg, PidDir));
+
+        OllamaCoordinator.All = Features;
     }
 
     /// <summary>重新读盘（改完 features.json 后调）。</summary>
@@ -89,5 +91,40 @@ public class FeatureManager
     {
         try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(ConfigPath) { UseShellExecute = true }); }
         catch { }
+    }
+}
+
+/// <summary>
+/// Ollama 依赖协调：某个 requiresOllama 的功能停掉后，检查还有没有别的功能需要它；
+/// 没有就关掉 Ollama（连同已加载模型一起卸，显存立刻释放）。
+/// </summary>
+public static class OllamaCoordinator
+{
+    public static IList<IFeature>? All { get; set; }
+
+    private static readonly SemaphoreSlim Gate = new(1, 1);
+
+    public static async Task ReleaseAsync(IFeature self)
+    {
+        await Gate.WaitAsync();
+        try
+        {
+            await Task.Delay(400); // 等被停的服务真的退掉
+
+            if (All == null) { OllamaRuntime.Stop(); return; }
+
+            // 先刷新自己 + 其它依赖方，避免用过期状态误判
+            try { await self.RefreshAsync(); } catch { }
+            foreach (var f in All.Where(f => !ReferenceEquals(f, self) && f.RequiresOllama).ToList())
+            {
+                try { await f.RefreshAsync(); } catch { }
+            }
+
+            var stillNeeded = All.Any(f => !ReferenceEquals(f, self) && f.RequiresOllama && f.State == FeatureState.Running);
+            var states = string.Join(", ", All.Where(f => f.RequiresOllama).Select(f => f.Id + "=" + f.State));
+            OllamaLog.Write($"release after {self.Id}: requiresOllama states [{states}] stillNeeded={stillNeeded}");
+            if (!stillNeeded) { OllamaLog.Write("stopping ollama"); OllamaRuntime.Stop(); OllamaLog.Write("ollama stop done"); }
+        }
+        finally { Gate.Release(); }
     }
 }

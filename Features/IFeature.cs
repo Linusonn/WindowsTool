@@ -28,6 +28,9 @@ public interface IFeature : INotifyPropertyChanged
     bool CanStop { get; }
     bool IsBusy { get; }
 
+    /// <summary>是否依赖 Ollama（用于按需启停）。</summary>
+    bool RequiresOllama { get; }
+
     Task StartAsync();
     Task StopAsync();
     Task RefreshAsync();
